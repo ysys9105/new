@@ -14,14 +14,14 @@ import com.cjon.book.service.BookService;
 /**
  * Servlet implementation class BookUpdateServlet
  */
-@WebServlet("/bookUpdate")
-public class BookUpdateServlet extends HttpServlet {
+@WebServlet("/bookAbout")
+public class BookAboutServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public BookUpdateServlet() {
+    public BookAboutServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -32,13 +32,11 @@ public class BookUpdateServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 1. 입력받고
 		String isbn = request.getParameter("isbn");
-		String title = request.getParameter("title");
-		String author = request.getParameter("author");
-		String price = request.getParameter("price");
+		System.out.println(isbn);
 		String callback = request.getParameter("callback");
 		// 2. 로직처리
 		BookService service = new BookService();
-		boolean result = service.updateBook(isbn,title,author,price);
+		String result = service.aboutBook(isbn);
 		// 3. 출력처리
 		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();

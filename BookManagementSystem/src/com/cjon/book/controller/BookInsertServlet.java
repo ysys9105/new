@@ -15,13 +15,13 @@ import com.cjon.book.service.BookService;
  * Servlet implementation class BookUpdateServlet
  */
 @WebServlet("/bookUpdate")
-public class BookUpdateServlet extends HttpServlet {
+public class BookInsertServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public BookUpdateServlet() {
+    public BookInsertServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
