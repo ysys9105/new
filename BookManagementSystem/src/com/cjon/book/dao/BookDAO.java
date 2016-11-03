@@ -23,7 +23,7 @@ public class BookDAO {
 		ResultSet rs = null;
 		String result = null;
 		try {
-			String sql = "select bisbn, bimgurl, btitle, bauthor, bprice "
+			String sql = "select bisbn, bimgbase64, btitle, bauthor, bprice "
 					   + "from book where btitle like ?";
 			pstmt= con.prepareStatement(sql);
 			pstmt.setString(1, "%" + keyword + "%");
@@ -32,7 +32,7 @@ public class BookDAO {
 			while(rs.next()) {
 				JSONObject obj = new JSONObject();
 				obj.put("isbn", rs.getString("bisbn"));
-				obj.put("img", rs.getString("bimgurl"));
+				obj.put("img", rs.getString("bimgbase64"));
 				obj.put("title", rs.getString("btitle"));
 				obj.put("author", rs.getString("bauthor"));
 				obj.put("price", rs.getString("bprice"));
@@ -139,6 +139,46 @@ public class BookDAO {
 			obj.put("supplement", rs.getString("bsupplement"));
 			
 			result = obj.toJSONString();
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
+	}
+	public boolean insert(String isbn, String title, String date, String page,  String price, String author, String translator, String supplement, String publisher, String imgurl, String imgbase64) {
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		
+		boolean result = false;
+		try {
+			
+			String sql = "insert into book (bisbn,btitle,bdate,bpage,bprice,bauthor,btranslator,bsupplement,bpublisher,bimgurl,bimgbase64) value (?,?,?,?,?,?,?,?,?,?,?)";
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, isbn);
+			pstmt.setString(2, title);
+			pstmt.setString(3, date);
+			pstmt.setInt(4,Integer.parseInt(page));
+			pstmt.setInt(5,Integer.parseInt(price));
+			pstmt.setString(6, author);
+			pstmt.setString(7, translator);
+			pstmt.setString(8, supplement);
+			pstmt.setString(9, publisher);
+			pstmt.setString(10, imgurl);
+			pstmt.setString(11, imgbase64);
+			
+			
+			int count = pstmt.executeUpdate();
+			// 결과값은 영향을 받은 레코드의 수
+			if( count == 1 ) {
+				result = true;
+				// 정상처리이기 때문에 commit
+				DBTemplate.commit(con);
+			} else {
+				DBTemplate.rollback(con);
+			}
 			
 		} catch (Exception e) {
 			System.out.println(e);

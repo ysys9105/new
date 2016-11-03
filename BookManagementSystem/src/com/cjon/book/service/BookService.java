@@ -35,7 +35,13 @@ public class BookService {
 		String result = dao.about(isbn);	
 		return result;
 	}
-
+	public boolean insertBook(String isbn, String title, String date, String page,  String price, String author, String translator, String supplement, String publisher, String imgurl, String imgbase64) {
+		// TODO Auto-generated method stub
+		BookDAO dao = new BookDAO();
+	
+		boolean result = dao.insert(isbn,title,date,page,price,author,translator,supplement,publisher,imgurl,imgbase64);	
+		return result;
+	}
 }
 
 

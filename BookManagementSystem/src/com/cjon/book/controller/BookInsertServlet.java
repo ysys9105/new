@@ -14,7 +14,7 @@ import com.cjon.book.service.BookService;
 /**
  * Servlet implementation class BookUpdateServlet
  */
-@WebServlet("/bookUpdate")
+@WebServlet("/bookInsert")
 public class BookInsertServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -33,12 +33,21 @@ public class BookInsertServlet extends HttpServlet {
 		// 1. 입력받고
 		String isbn = request.getParameter("isbn");
 		String title = request.getParameter("title");
-		String author = request.getParameter("author");
+		String date = request.getParameter("date");
+		String page = request.getParameter("page");
 		String price = request.getParameter("price");
+		String author = request.getParameter("author");
+		String translator = request.getParameter("translator");
+		String supplement = request.getParameter("supplement");
+		String publisher = request.getParameter("publisher");
+		String imgurl = request.getParameter("imgurl");
+		String imgbase64 = request.getParameter("imgbase64");
 		String callback = request.getParameter("callback");
+
+
 		// 2. 로직처리
 		BookService service = new BookService();
-		boolean result = service.updateBook(isbn,title,author,price);
+		boolean result = service.insertBook(isbn,title,date,page,price,author,translator,supplement,publisher,imgurl,imgbase64);
 		// 3. 출력처리
 		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
