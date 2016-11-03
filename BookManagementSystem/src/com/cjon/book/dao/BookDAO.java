@@ -188,6 +188,74 @@ public class BookDAO {
 		} 
 		return result;
 	}
+	public boolean newUser(String ID,String fname,String lname,String email,String pw) {
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		
+		boolean result = false;
+		try {
+			
+			String sql = "insert into user (ID,fname,lname,email,pw) value (?,?,?,?,?)";
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, ID);
+			pstmt.setString(2, fname);
+			pstmt.setString(3, lname);
+			pstmt.setString(4, email);
+			pstmt.setString(5, pw);
+			
+			int count = pstmt.executeUpdate();
+			// 결과값은 영향을 받은 레코드의 수
+			if( count == 1 ) {
+				result = true;
+				// 정상처리이기 때문에 commit
+				DBTemplate.commit(con);
+			} else {
+				DBTemplate.rollback(con);
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
+	}
+	
+	public String userLogin(String ID, String pw) {
+		
+		Connection con = DBTemplate.getConnection();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String result = null;
+		try {
+			String sql = "select pw from user where ID = ?";
+			pstmt= con.prepareStatement(sql);
+			pstmt.setString(1, ID);
+			rs = pstmt.executeQuery();
+			
+			rs.next();
+			if(rs.getString("pw").equals(pw)){
+				result = ID;
+			
+			}
+			else{
+				result="error";
+			}
+			System.out.println(ID + pw +"DAO");
+
+		}
+			catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DBTemplate.close(rs);
+			DBTemplate.close(pstmt);
+			DBTemplate.close(con);
+		} 
+		return result;
+	
+	
+		}
 }
 
 
