@@ -2,29 +2,28 @@ package com.cjon.book.controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.json.simple.JSONObject;
 
 import com.cjon.book.service.BookService;
 
 /**
- * Servlet implementation class BookListServlet
+ * Servlet implementation class BookUpdateServlet
  */
-@WebServlet("/userSession")
-public class UserSessionServlet extends HttpServlet {
+@WebServlet("/insertComment")
+public class CommentInsertServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public UserSessionServlet() {
+    public CommentInsertServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,31 +33,26 @@ public class UserSessionServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 1. 입력받고
-		
-		String callback = request.getParameter("callback"); 
+		String isbn = request.getParameter("bisbn");
+		String title = request.getParameter("ctitle");
+		String author = request.getParameter("cauthor");
+		Date d = new Date();
+		DateFormat f = DateFormat.getDateInstance(DateFormat.SHORT);
+		String date = f.format(d);
+		String text = request.getParameter("ctext");
+		String callback = request.getParameter("callback");
 
-				JSONObject obj = new JSONObject();
-				HttpSession session = request.getSession(true);
-				
-				String id = (String)session.getAttribute("ID");
-				System.out.println("==" + id);
-				if( id != null ) {
-					// 이미로그인한 상태
-					obj.put("Login", true);
-					obj.put("ID", id);
+		System.out.println("==" + author);
 
-				} else {
-					obj.put("Login", false);					
-				}
-				
-			
-			String result = obj.toJSONString();
-			
-			response.setContentType("text/plain; charset=utf8");
-			PrintWriter out = response.getWriter();
-			out.println(callback + "(" + result + ")");
-			out.flush();
-			out.close();
+		// 2. 로직처리
+		BookService service = new BookService();
+		boolean result = service.insertComment(isbn,title,author,date,text);
+		// 3. 출력처리
+		response.setContentType("text/plain; charset=utf8");
+		PrintWriter out = response.getWriter();
+		out.println(callback + "(" + result + ")");
+		out.flush();
+		out.close();
 	}
 
 	/**

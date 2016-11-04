@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONObject;
+
 import com.cjon.book.service.BookService;
 
 /**
@@ -33,26 +35,31 @@ public class UserLoginServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 1. 입력받고
 		
-		String ID = request.getParameter("ID"); 
+		String id = request.getParameter("ID"); 
 		String pw = request.getParameter("pw");
 		String callback = request.getParameter("callback"); 
 		
 		BookService service = new BookService();		
-		String result = service.userLogin(ID,pw);
+		String result = service.userLogin(id,pw);
+		JSONObject obj = new JSONObject();
 		
 		if(result.equals("error")){
-			
+			obj.put("status", "error");
 		}
 		else{
 			HttpSession session = request.getSession(true);
-			session.setAttribute("ID", ID);
+			session.setAttribute("ID", id);
+			obj.put("status", result);
+			
 		}
 			
-		System.out.println(ID + pw +"서블릿");
+		System.out.println(id + pw +"서블릿");
+		
+		
 		
 		response.setContentType("text/plain; charset=utf8");
 		PrintWriter out = response.getWriter();
-		out.println(callback + "(" + result + ")");
+		out.println(callback + "(" + obj.toJSONString() + ")");
 		out.flush();
 		out.close();
 	}

@@ -256,16 +256,113 @@ public class BookDAO {
 	
 	
 		}
+
+
+
+public boolean insertComment( String isbn, String title, String author, String date, String text) {
+	Connection con = DBTemplate.getConnection();
+	PreparedStatement pstmt = null;
+	
+	boolean result = false;
+	try {
+		
+		String sql = "insert into book_comment (bisbn,ctitle,cauthor,cdate,ctext) value (?,?,?,?,?)";
+		pstmt= con.prepareStatement(sql);
+		pstmt.setString(1, isbn);
+		pstmt.setString(2, title);
+		pstmt.setString(3, author);
+		pstmt.setString(4, date);
+		pstmt.setString(5, text);
+		
+		
+		
+		int count = pstmt.executeUpdate();
+		// 결과값은 영향을 받은 레코드의 수
+		if( count == 1 ) {
+			result = true;
+			// 정상처리이기 때문에 commit
+			DBTemplate.commit(con);
+		} else {
+			DBTemplate.rollback(con);
+		}
+		
+	} catch (Exception e) {
+		System.out.println(e);
+	} finally {
+		DBTemplate.close(pstmt);
+		DBTemplate.close(con);
+	} 
+	return result;
+}
+public String commentSelect(String keyword) {
+	
+	Connection con = DBTemplate.getConnection();
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
+	String result = null;
+	try {
+		String sql = "select b.bisbn, c.cid, b.btitle, b.bimgbase64, c.ctitle, c.cauthor, c.cdate, c.ctext from book b"+
+				" join book_comment c on b.bisbn = c.bisbn where b.btitle like ? order by c.cid desc";
+		pstmt= con.prepareStatement(sql);
+		pstmt.setString(1, "%" + keyword + "%");
+		rs = pstmt.executeQuery();
+		JSONArray arr = new JSONArray();
+		while(rs.next()) {
+			JSONObject obj = new JSONObject();
+			obj.put("isbn", rs.getString("bisbn"));
+			obj.put("cid", rs.getString("cid"));
+			obj.put("btitle", rs.getString("btitle"));
+			obj.put("img", rs.getString("bimgbase64"));
+			obj.put("ctitle", rs.getString("ctitle"));
+			obj.put("author", rs.getString("cauthor"));
+			obj.put("date", rs.getString("cdate"));
+			obj.put("text", rs.getString("ctext"));
+			arr.add(obj);
+		}
+		result = arr.toJSONString();
+	} catch (Exception e) {
+		System.out.println(e);
+	} finally {
+		DBTemplate.close(rs);
+		DBTemplate.close(pstmt);
+		DBTemplate.close(con);
+	} 
+	return result;
+}
+
+public boolean deleteComment(String cid) {
+	Connection con = DBTemplate.getConnection();
+	PreparedStatement pstmt = null;
+	
+	boolean result = false;
+	try {
+		
+		String sql = "delete from book_comment where cid=?";
+		pstmt= con.prepareStatement(sql);
+		pstmt.setString(1, cid);
+		
+		int count = pstmt.executeUpdate();
+		// 결과값은 영향을 받은 레코드의 수
+		if( count == 1 ) {
+			result = true;
+			// 정상처리이기 때문에 commit
+			DBTemplate.commit(con);
+		} else {
+			DBTemplate.rollback(con);
+		}
+		
+	} catch (Exception e) {
+		System.out.println(e);
+	} finally {
+		DBTemplate.close(pstmt);
+		DBTemplate.close(con);
+	} 
+	return result;
 }
 
 
 
-
-
-
-
-
-
+}
 
 
 

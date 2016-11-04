@@ -8,23 +8,20 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.json.simple.JSONObject;
 
 import com.cjon.book.service.BookService;
 
 /**
  * Servlet implementation class BookListServlet
  */
-@WebServlet("/userSession")
-public class UserSessionServlet extends HttpServlet {
+@WebServlet("/commentList")
+public class CommentListServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public UserSessionServlet() {
+    public CommentListServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -34,31 +31,22 @@ public class UserSessionServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// 1. 입력받고
-		
-		String callback = request.getParameter("callback"); 
-
-				JSONObject obj = new JSONObject();
-				HttpSession session = request.getSession(true);
-				
-				String id = (String)session.getAttribute("ID");
-				System.out.println("==" + id);
-				if( id != null ) {
-					// 이미로그인한 상태
-					obj.put("Login", true);
-					obj.put("ID", id);
-
-				} else {
-					obj.put("Login", false);					
-				}
-				
-			
-			String result = obj.toJSONString();
-			
-			response.setContentType("text/plain; charset=utf8");
-			PrintWriter out = response.getWriter();
-			out.println(callback + "(" + result + ")");
-			out.flush();
-			out.close();
+		String keyword = request.getParameter("keyword"); // 책에 대한 keyword를 받는부분
+		String callback = request.getParameter("callback"); // JSONP처리를 위해서 사용
+		// 2. 로직처리하고(DB처리포함)
+		// Servlet은 입력을 받고 출력에대한 지정을 담당. 로직처리는 하지 않아요!!
+		// 로직처리하는 객체를 우리가 일반적으로 Service객체라고 불러요! 이놈을 만들어서 일을 시켜서
+		// 결과를 받아오는 구조로 만들어 보아요!
+		// 로직처리를 하기 위해서 일단 Service객체를 하나 생성합니다.
+		BookService service = new BookService();		
+		String result = service.commentList(keyword);
+		// 결과로 가져올건..DB 처리한 후 나온 책에 대한 JSON data		
+		// 3. 출력처리
+		response.setContentType("text/plain; charset=utf8");
+		PrintWriter out = response.getWriter();
+		out.println(callback + "(" + result + ")");
+		out.flush();
+		out.close();
 	}
 
 	/**
