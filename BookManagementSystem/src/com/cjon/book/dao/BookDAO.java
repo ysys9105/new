@@ -359,9 +359,68 @@ public boolean deleteComment(String cid) {
 	} 
 	return result;
 }
+public String lendableList(String keyword) {
+	
+	Connection con = DBTemplate.getConnection();
+	PreparedStatement pstmt = null;
+	ResultSet rs = null;
+	String result = null;
+	try {
+		String sql = "select bisbn, btitle, bimgbase64 from lendbook where lender is null and btitle like ?";
+		pstmt= con.prepareStatement(sql);
+		pstmt.setString(1, "%" + keyword + "%");
+		rs = pstmt.executeQuery();
+		JSONArray arr = new JSONArray();
+		while(rs.next()) {
+			JSONObject obj = new JSONObject();
+			obj.put("isbn", rs.getString("bisbn"));
+			obj.put("title", rs.getString("btitle"));
+			obj.put("img", rs.getString("bimgbase64"));
+		
+			arr.add(obj);
+		}
+		result = arr.toJSONString();
+	} catch (Exception e) {
+		System.out.println(e);
+	} finally {
+		DBTemplate.close(rs);
+		DBTemplate.close(pstmt);
+		DBTemplate.close(con);
+	} 
+	return result;
+}
 
 
-
+public boolean lendBook(String isbn, String cid, String date) {
+	Connection con = DBTemplate.getConnection();
+	PreparedStatement pstmt = null;
+	
+	boolean result = false;
+	try {
+		
+		String sql = "update lendbook set lender = ? ldate = ? where isbn=?";
+		pstmt= con.prepareStatement(sql);
+		pstmt.setString(1, cid);
+		pstmt.setString(2, date);
+		pstmt.setString(3, isbn);
+		
+		int count = pstmt.executeUpdate();
+		// 결과값은 영향을 받은 레코드의 수
+		if( count == 1 ) {
+			result = true;
+			// 정상처리이기 때문에 commit
+			DBTemplate.commit(con);
+		} else {
+			DBTemplate.rollback(con);
+		}
+		
+	} catch (Exception e) {
+		System.out.println(e);
+	} finally {
+		DBTemplate.close(pstmt);
+		DBTemplate.close(con);
+	} 
+	return result;
 }
 
 
@@ -370,3 +429,7 @@ public boolean deleteComment(String cid) {
 
 
 
+
+
+
+}

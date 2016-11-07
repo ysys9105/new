@@ -89,14 +89,25 @@ public class BookService {
 		return result;
 	}
 	
+
+
+
+
+public String lendableList(String keyword) {
+	BookDAO dao = new BookDAO();
+
+	String result = dao.lendableList(keyword);	
+	
+	return result;
 }
 
-
-
-
-
-
-
+public boolean lendBook(String isbn, String cid, String date) {
+	// TODO Auto-generated method stub
+	BookDAO dao = new BookDAO();
+	boolean result = dao.lendBook(isbn, cid,date);	
+	return result;
+}
+}
 
 
 
